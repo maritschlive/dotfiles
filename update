@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+"""Snapshot selected live configs, commit, and push."""
+import argparse
+import datetime
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
+
+ROOT = Path(__file__).resolve().parent
+
+def git(*args, check=True):
+    return subprocess.run(['git', '-C', str(ROOT), *args], check=check)
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--no-push', action='store_true', help='Commit locally only')
+    parser.add_argument('-m', '--message', help='Custom commit message')
+    args = parser.parse_args()
+    home = Path.home()
+    config = Path(os.environ.get('XDG_CONFIG_HOME') or home / '.config')
+    zdir = Path(os.environ.get('ZDOTDIR') or home)
+    sources = [(config / 'nvim', Path('.config/nvim')),
+               (config / 'kitty', Path('.config/kitty')),
+               (zdir / '.zshrc', Path('.zshrc'))]
+    for source, _ in sources:
+        if not source.exists():
+            parser.error(f'Required config missing: {source}; no files changed')
+    sources += [(zdir / name, Path(name)) for name in
+                ('.zshenv', '.zprofile', '.zlogin', '.zlogout')]
+    sources.append((home / '.p10k.zsh', Path('.p10k.zsh')))
+    if not args.no_push:
+        remote = subprocess.run(['git', '-C', str(ROOT), 'remote', 'get-url', 'origin'],
+                                capture_output=True, text=True)
+        if remote.returncode:
+            parser.error('Set a remote first: git remote add origin <URL> (or use --no-push)')
+    staged = subprocess.run(['git', '-C', str(ROOT), 'diff', '--cached', '--quiet'])
+    if staged.returncode != 0:
+        parser.error('Commit or unstage existing staged changes before running update')
+    # Prepare the entire snapshot before replacing any tracked copies.
+    with tempfile.TemporaryDirectory(prefix='dotfiles-') as temp:
+        snapshot = Path(temp)
+        for source, relative in sources:
+            if not source.exists():
+                continue
+            target = snapshot / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if source.is_dir():
+                shutil.copytree(source, target, ignore=shutil.ignore_patterns(
+                    '.git', '__pycache__', '*.swp', '*.swo', '*~', '.DS_Store'))
+            else:
+                shutil.copy2(source, target)
+        for _, relative in sources:
+            target = ROOT / relative
+            if target.is_symlink() or target.is_file():
+                target.unlink()
+            elif target.is_dir():
+                shutil.rmtree(target)
+            source = snapshot / relative
+            if source.exists():
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(source), str(target))
+    git('add', '-A', '--', '.config', '.zshrc')
+    for _, relative in sources[3:]:
+        tracked = subprocess.run(['git', '-C', str(ROOT), 'ls-files', '--error-unmatch',
+                                  str(relative)], capture_output=True)
+        if (ROOT / relative).exists() or tracked.returncode == 0:
+            git('add', '-A', '--', str(relative))
+    result = git('diff', '--cached', '--quiet', check=False)
+    if result.returncode == 1:
+        git('commit', '-m', args.message or
+            f'Update dotfiles {datetime.datetime.now():%Y-%m-%d %H:%M:%S}')
+    elif result.returncode:
+        raise RuntimeError('Cannot inspect staged changes')
+    else:
+        print('Configs are already up to date.', flush=True)
+    if not args.no_push:
+        # Also retries a previous failed push when the snapshot is unchanged.
+        git('push', '--set-upstream', 'origin', 'HEAD')
+
+if __name__ == '__main__':
+    try:
+        main()
+    except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+        raise SystemExit(f'Update failed: {error}')
