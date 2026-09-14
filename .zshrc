@@ -99,3 +99,4 @@ updateall() {
     flatpak update
   fi
 }
+dotupdate() { "$HOME/dotfiles/update" "$@"; }
