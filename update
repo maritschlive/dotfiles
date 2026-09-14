@@ -23,10 +23,13 @@ def main():
     zdir = Path(os.environ.get('ZDOTDIR') or home)
     sources = [(config / 'nvim', Path('.config/nvim')),
                (config / 'kitty', Path('.config/kitty')),
+               (config / 'hypr', Path('.config/hypr')),
+               (config / 'waybar', Path('.config/waybar')),
                (zdir / '.zshrc', Path('.zshrc'))]
     for source, _ in sources:
         if not source.exists():
             parser.error(f'Required config missing: {source}; no files changed')
+    required_count = len(sources)
     sources += [(zdir / name, Path(name)) for name in
                 ('.zshenv', '.zprofile', '.zlogin', '.zlogout')]
     sources.append((home / '.p10k.zsh', Path('.p10k.zsh')))
@@ -62,7 +65,7 @@ def main():
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(str(source), str(target))
     git('add', '-A', '--', '.config', '.zshrc')
-    for _, relative in sources[3:]:
+    for _, relative in sources[required_count:]:
         tracked = subprocess.run(['git', '-C', str(ROOT), 'ls-files', '--error-unmatch',
                                   str(relative)], capture_output=True)
         if (ROOT / relative).exists() or tracked.returncode == 0:
