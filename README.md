@@ -1,6 +1,6 @@
 # Dotfiles
 
-Personal Neovim, Kitty, Hyprland, Waybar, and zsh configuration, including Powerlevel10k prompt settings.
+Personal Neovim, Kitty, Hyprland, Waybar, Yazi, and zsh configuration, including Powerlevel10k prompt settings.
 Edit your live configs normally, then run this from the repository:
 
 ```sh
@@ -26,7 +26,7 @@ For a shorter command, add an alias to your `.zshrc` pointing to this repo's `up
 
 ## Included files
 
-- `nvim`, `kitty`, `hypr`, and `waybar` under `$XDG_CONFIG_HOME` (defaults to `~/.config`).
+- `nvim`, `kitty`, `hypr`, `waybar`, and `yazi` under `$XDG_CONFIG_HOME` (defaults to `~/.config`).
 - `.zshrc` and any `.zshenv`, `.zprofile`, `.zlogin`, `.zlogout` under `${ZDOTDIR:-$HOME}`.
 - `~/.p10k.zsh`, when present.
 
@@ -37,8 +37,8 @@ Only config files are committed by `update`; commit edits to this README or scri
 
 ## Restore on another machine
 
-Back up existing configs first, then copy `.config/nvim`, `.config/kitty`, `.config/hypr`, and `.config/waybar` into
+Back up existing configs first, then copy `.config/nvim`, `.config/kitty`, `.config/hypr`, `.config/waybar`, and `.config/yazi` into
 your config directory and the root-level zsh dotfiles into your home (or `ZDOTDIR`).
-Install Neovim, Kitty, Hyprland, Waybar, zsh, and the tools referenced in `.zshrc` separately, including
+Install Neovim, Kitty, Hyprland, Waybar, Yazi, zsh, and the tools referenced in `.zshrc` separately, including
 Powerlevel10k, carapace, and fzf. Your Kitty config uses JetBrainsMono Nerd Font.
 Machine-specific paths in `.zshrc` may need adjustment.

@@ -1,0 +1,4 @@
+[opener]
+edit = [
+	{ run = 'nvim-auto-venv %s', block = true, for = 'unix' },
+]

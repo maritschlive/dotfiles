@@ -25,6 +25,7 @@ def main():
                (config / 'kitty', Path('.config/kitty')),
                (config / 'hypr', Path('.config/hypr')),
                (config / 'waybar', Path('.config/waybar')),
+               (config / 'yazi', Path('.config/yazi')),
                (zdir / '.zshrc', Path('.zshrc'))]
     for source, _ in sources:
         if not source.exists():
