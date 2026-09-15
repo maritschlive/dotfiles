@@ -27,6 +27,7 @@ For a shorter command, add an alias to your `.zshrc` pointing to this repo's `up
 ## Included files
 
 - `nvim`, `kitty`, `hypr`, `waybar`, and `yazi` under `$XDG_CONFIG_HOME` (defaults to `~/.config`).
+- `~/.local/bin/nvim-auto-venv`, used by Yazi to launch Neovim with a project virtual environment.
 - `.zshrc` and any `.zshenv`, `.zprofile`, `.zlogin`, `.zlogout` under `${ZDOTDIR:-$HOME}`.
 - `~/.p10k.zsh`, when present.
 
@@ -39,6 +40,7 @@ Only config files are committed by `update`; commit edits to this README or scri
 
 Back up existing configs first, then copy `.config/nvim`, `.config/kitty`, `.config/hypr`, `.config/waybar`, and `.config/yazi` into
 your config directory and the root-level zsh dotfiles into your home (or `ZDOTDIR`).
+Copy `.local/bin/nvim-auto-venv` to the same path in your home directory and keep it executable.
 Install Neovim, Kitty, Hyprland, Waybar, Yazi, zsh, and the tools referenced in `.zshrc` separately, including
 Powerlevel10k, carapace, and fzf. Your Kitty config uses JetBrainsMono Nerd Font.
 Machine-specific paths in `.zshrc` may need adjustment.

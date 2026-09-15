@@ -17,6 +17,7 @@ source <(carapace _carapace)
 
 
 # Alias'sss
+alias larobot="ssh lavita@10.64.9.60"
 alias vim="nvim"
 alias vi="nvim"
 alias config="nvim ~/.zshrc"

@@ -1,0 +1,29 @@
+#!/usr/bin/env zsh
+
+file="$1"
+
+if [[ -n "$file" ]]; then
+    if [[ -d "$file" ]]; then
+        dir="$file"
+    else
+        dir="${file:h}"
+    fi
+else
+    dir="$PWD"
+fi
+
+dir="${dir:A}"
+
+while [[ "$dir" != "/" ]]; do
+    if [[ -d "$dir/.venv" ]]; then
+        source "$dir/.venv/bin/activate"
+        break
+    elif [[ -d "$dir/venv" ]]; then
+        source "$dir/venv/bin/activate"
+        break
+    fi
+
+    dir="${dir:h}"
+done
+
+exec nvim "$@"
